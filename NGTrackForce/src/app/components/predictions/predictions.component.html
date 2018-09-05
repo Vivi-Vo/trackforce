@@ -86,7 +86,36 @@
       </div>
     </div>
   </div>
-
+<!-- Breakdown of available associates filtered by batchID and curriculum-->
+<div class="row" *ngIf="availableClick">
+  <h3>Available Associates</h3>
+  <div class ="table-div">
+    <table id ="availableAssociates" >
+      <thead>
+        <tr>
+          <th class="id">Associate ID</th>
+          <th class="first">First Name</th>
+          <th class="last">Last Name</th>
+          <th class="status">Marketing Status</th>
+          <th class="batch">Batch Name</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let associate of associates | pipeByBatch: '' | pipeByStatus: 'UNMAPPED: OPEN'">
+          <td>
+            <a [routerLink]="['/form-comp',associate.id]" class="id" *ngIf="associate.id">{{associate.id}}</a>
+          </td>
+          <td class="first"><span *ngIf="associate.firstName">{{associate.firstName}}</span></td>
+          <td class="last"><span *ngIf="associate.lastName">{{associate.lastName}}</span></td>
+          <td class="status"><span *ngIf="associate.marketingStatus && associate.marketingStatus.name">{{associate.marketingStatus.name}}</span></td>
+          <td class="batch">
+            <a *ngIf="associate.batch" class="batch" [routerLink]="['/batch-details', associate.batch.id]"><span *ngIf="associate.batch.batchName">{{associate.batch.batchName}}</span></a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
   <!-- Batch Details: Breakdown of batches available for a single curriculum -->
   <div class="row" *ngIf="detailsReady || loadingDetails">
     <h3 id="batchDetailsHeader">{{selectedBatch}} Batch Details</h3>
@@ -107,7 +136,8 @@
           <thead>
             <tr>
               <th>Batch ID</th>
-              <th>Available Associates</th>
+              <th> Unmapped Associates</th>
+              <th> Mapped Associates</th>
               <th>Start Date</th>
               <th>End Date</th>
             </tr>
@@ -116,6 +146,7 @@
             <ng-container *ngFor="let x of batches['courseBatches']">
               <tr *ngIf="x['associateCount'] != 0 || showEmpty">
                 <td>{{x['batchName']}}</td>
+                <td>{{x['associateCount']}}</td>
                 <td>{{x['associateCount']}}</td>
                 <td>{{x['startDate'] | date}}</td>
                 <td>{{x['endDate'] | date}}</td>

@@ -38,6 +38,7 @@ export class PredictionsComponent implements OnInit {
   public loadingDetails: boolean;
   public maxAssociates: number = 1000;
   public showEmpty: boolean = true;
+  public availableClick = true;
   //public curriculums: any[];
 
   //Assoc----------------------------------
@@ -195,17 +196,19 @@ export class PredictionsComponent implements OnInit {
    * @param isUpdate true if part of single fetch; false when part of a batch
    */
   getPrediction(techIndex: number, isUpdate: boolean) {
-    if(this.results.length == 0)
+    if(this.results.length === 0){
       this.loadingPredictions = true;
+    }
     this.detailsReady = false;
     this.noBatches = false;
 
-    if(isUpdate)
+    if(isUpdate){
       this.results = this.results.filter(o => o['technologyIndex'] != techIndex);
-
+    }
     let techName = this.technologies[techIndex]["name"];
-    if(this.techNeeded[techIndex] == undefined || this.techNeeded[techIndex] <= 0 || this.techNeeded[techIndex] > this.maxAssociates)
+    if(this.techNeeded[techIndex] == undefined || this.techNeeded[techIndex] <= 0 || this.techNeeded[techIndex] > this.maxAssociates){
       return;
+    }
 
     this.bs.getAssociateCountByCurriculum(new Date(this.startDate), new Date(this.endDate), techName).subscribe(
       data => {
@@ -218,7 +221,6 @@ export class PredictionsComponent implements OnInit {
         this.results.sort((o1,o2) => o1['technologyIndex'] - o2['technologyIndex'])
         this.loadingPredictions = false;
       },
-
       err => err
     )
   }
@@ -239,7 +241,6 @@ export class PredictionsComponent implements OnInit {
     this.detailsReady = false;
     this.loadingDetails = true;
     this.noBatches = false;
-
 
     this.selectedBatch = tech;
     /*

@@ -56,6 +56,7 @@ import { NavbarService } from './services/navbar-service/navbar.service';
 import { AssociateSearchByTextFilter } from './pipes/associate-search-by-text-filter/associate-search-by-text-filter.pipes';
 import { AssociateSearchByStatusPipe } from './pipes/associate-search-by-status-pipe/status-pipe.pipe';
 import { AssociateSearchByClientPipe } from './pipes/associate-search-by-client-pipe/client-pipe.pipe';
+import { AssociateSearchByBatchPipe } from './pipes/associate-search-by-batch-pipe/batch-pipe.pipe';
 
 ///
 //  SECURITY
@@ -114,6 +115,7 @@ import { SalesforceComponent } from './components/salesforce/salesforce.componen
     DateTimePickerComponent,
     AssociateSearchByStatusPipe,
     AssociateSearchByClientPipe,
+    AssociateSearchByBatchPipe,
     InvalidSessionComponent,
     HighlightInterviewDirective,
     SalesforceComponent
