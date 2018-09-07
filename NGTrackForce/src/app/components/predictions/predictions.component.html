@@ -88,9 +88,9 @@
   </div>
 <!-- Breakdown of available associates filtered by batchID and curriculum-->
 <div class="row" *ngIf="availableClick">
-  <h3>Available Associates</h3>
+  <h3>Available {{mappingStatus}} Associates</h3>
   <div class ="table-div">
-    <table id ="availableAssociates" >
+    <table id ="availableAssociates" class = "table table-striped table-hover table-bordered">
       <thead>
         <tr>
           <th class="id">Associate ID</th>
@@ -101,7 +101,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let associate of associates | pipeByBatch: '' | pipeByStatus: 'UNMAPPED: OPEN'">
+        <tr *ngFor="let associate of associates | pipeByBatch: selectedBatchID | pipeByStatus: 'UNMAPPED: OPEN'">
           <td>
             <a [routerLink]="['/form-comp',associate.id]" class="id" *ngIf="associate.id">{{associate.id}}</a>
           </td>
@@ -146,8 +146,8 @@
             <ng-container *ngFor="let x of batches['courseBatches']">
               <tr *ngIf="x['associateCount'] != 0 || showEmpty">
                 <td>{{x['batchName']}}</td>
-                <td>{{x['associateCount']}}</td>
-                <td>{{x['associateCount']}}</td>
+                <td (click)="unmappedClick()">{{x['associateCount']}}</td>
+                <td (click) = "mappedClick()">{{x['associateCount']}}</td>
                 <td>{{x['startDate'] | date}}</td>
                 <td>{{x['endDate'] | date}}</td>
               </tr>

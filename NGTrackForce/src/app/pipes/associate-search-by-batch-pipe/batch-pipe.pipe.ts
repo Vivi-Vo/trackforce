@@ -11,7 +11,7 @@ export class AssociateSearchByBatchPipe implements PipeTransform {
       return items;
     }
     return items.filter(associate => {
-      return ((associate.batch != null) ? associate.batch === searchText : false);
+      return ((associate.batch != null) ? associate.batch.batchName === searchText : false);
     });
   }
 }

@@ -38,7 +38,9 @@ export class PredictionsComponent implements OnInit {
   public loadingDetails: boolean;
   public maxAssociates: number = 1000;
   public showEmpty: boolean = true;
-  public availableClick = true;
+  public availableClick = false;
+  public mappingStatus: string;
+  public selectedBatchID: string;
   //public curriculums: any[];
 
   //Assoc----------------------------------
@@ -261,5 +263,19 @@ export class PredictionsComponent implements OnInit {
       error => {
         console.log(error);
       });
+  }
+
+  unmappedClick(event) {
+    this.availableClick = true;
+    this.mappingStatus = "Unmapped";
+    console.log(this.selectedBatchID);
+
+  }
+
+  mappedClick(event) {
+    this.availableClick = true;
+    this.mappingStatus = "Mapped";
+    console.log(this.selectedBatchID);
+
   }
 }
