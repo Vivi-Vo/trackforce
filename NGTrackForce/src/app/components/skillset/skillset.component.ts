@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { AutoUnsubscribe } from '../../decorators/auto-unsubscribe.decorator';
 import { ChartScale } from '../../models/chart-scale.model';
 import { CurriculumService } from '../../services/curriculum-service/curriculum.service';
@@ -11,8 +11,7 @@ import { ChartOptions } from '../../models/ng2-charts-options.model';
 import '../../constants/selected-status.constants';
 import { SelectedStatusConstants } from '../../constants/selected-status.constants';
 import { Color } from 'ng2-charts';
-
-
+import { BaseChartDirective } from 'ng2-charts/ng2-charts';
 @Component({
   selector: 'app-skillset',
   templateUrl: './skillset.component.html',
@@ -112,13 +111,13 @@ export class SkillsetComponent implements OnInit {
    */
   batchColors = ThemeConstants.BATCH_COLORS;
 
+  @ViewChild(BaseChartDirective) chart: BaseChartDirective;
 
   public unmappedLabels = SelectedStatusConstants.UNMAPPED_LABELS;
   public skillColors: Array<Color> = ThemeConstants.SKILL_COLORS;
   public unmappedChartType = "pie";
   public unmappedOptions = ChartOptions.createOptionsTitle('Unmapped', 24, '#121212', 'right');
   public unmappedData: number[] = [0, 0, 0, 0];
-
 
   /**
     *@param {CurriculumService} CurriculumService
@@ -140,6 +139,7 @@ export class SkillsetComponent implements OnInit {
       SkillsetComponent.SKILL_INFO.set(SelectedStatusConstants.TRAINING, 0);
       SkillsetComponent.SKILL_INFO.set(SelectedStatusConstants.OPEN, 1);
       SkillsetComponent.SKILL_INFO.set(SelectedStatusConstants.SELECTED, 2);
+      SkillsetComponent.SKILL_INFO.set(SelectedStatusConstants.CONFIRMED, 3);
     }
   }
 
@@ -151,35 +151,54 @@ export class SkillsetComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
     this.getUnmappedData();
     this.skillID = SkillsetComponent.SKILL_INFO.get(this.selectedStatus) || SkillsetComponent.NULL;
     // if we didn't get skillID from selectedStatus...
     if (this.skillID === SkillsetComponent.NULL) {
       // we get it from the ActivatedRoute params
       this.skillID = Number(this.route.snapshot.paramMap.get('id'));
+    }
+    this.setSelectedStatus(this.skillID);
+    this.loadChart();
+
+  }
+  setSelectedStatus(skillID){
       // we now set selectedStatus
       SkillsetComponent.SKILL_INFO.forEach((value, key) => {
-        if (value === this.skillID) {
+        if (value === skillID) {
           this.selectedStatus = key;
         }
       })
     }
-    // get the skillset data here
+
+  loadChart(){
     this.curriculumService.getSkillsetsForStatusID(6).subscribe((data) => {
       // copy in the raw data into local variable
       const skillsets: GraphCounts[] = data;
+
       // map() that variable into skillsetData,skillsetLabels
       this.skillsetData = skillsets.map((obj) => { if (obj.count) { return obj.count } }).filter(this.isNotUndefined);
       this.skillsetLabels = skillsets.map((obj) => { if (obj.count) { return obj.name } }).filter(this.isNotUndefined);
+
       this.status = (((!this.skillsetLabels) || (!this.skillsetLabels.length)) &&
-        ((!this.skillsetData) || (!this.skillsetData.length))) ?
-        'There is no batch data on this status...' : 'Loaded!';
+      ((!this.skillsetData) || (!this.skillsetData.length))) ?
+      'There is no batch data on this status...' : 'Loaded!';
+
     });
-
+    this.setSelectedStatus(this.skillID);
     this.chartOptions.title.text = this.selectedStatus;
-
   }
+
+  updateChart() {
+    if (this.chart !== undefined) {
+      this.chart.chart.destroy();
+      this.chart.chart = 0;
+      this.chart.datasets = this.skillsetData;
+      this.chart.labels = this.skillsetLabels;
+      this.chartOptions.title.text = this.selectedStatus;
+      this.chart.ngOnInit();
+    }
+}
 
   /**
    * Changes the chart type of this component (does this really need explanation?!)
@@ -211,6 +230,8 @@ export class SkillsetComponent implements OnInit {
         break;
     }
     // it's a mock, for right now
+    this.loadChart();
+
     return type;
   }
 
@@ -250,7 +271,16 @@ export class SkillsetComponent implements OnInit {
     if (evt.active[0] !== undefined) {
       //navigate to skillset component
       this.router.navigate([`skillset/${evt.active[0]._index}`]);
-      window.location.reload();
+      this.loadChart();
+
+      this.skillID = Number(this.route.snapshot.paramMap.get('id'));
+      console.log("skillID: " + this.skillID);
+
+      this.setSelectedStatus(this.skillID);
+      this.updateChart();
+
+
+//      window.location.reload();
     }
   }
 
